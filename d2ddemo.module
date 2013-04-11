@@ -1,0 +1,75 @@
+<?php
+
+/**
+ * @file
+ * A demo add-on for the D2D module.
+ *
+ * A longer description will follow here.
+ */
+
+require_once 'includes/d2ddemo.info.inc';
+require_once 'includes/d2ddemo.remote_control.inc';
+require_once 'includes/d2ddemo.list_friends_of_friends.inc';
+
+/**
+ * Implements hook_menu_alter().
+ */
+function d2ddemo_menu_alter(&$items) {
+  $items['admin/d2d/demo'] = array(
+    'title' => 'D2D Demo',
+    'page callback' => 'd2ddemo_show_info',
+    'access arguments' => array('administer d2d'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 55,
+  );
+  $items['admin/d2d/demo/info'] = array(
+    'title' => 'Friends Info',
+    'page callback' => 'd2ddemo_show_info',
+    'access arguments' => array('administer d2d'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+  $items['admin/d2d/demo/friends_of_friends'] = array(
+    'title' => 'Friends of friends',
+    'page callback' => 'd2ddemo_list_friends_of_friends',
+    'access arguments' => array('administer d2d'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+  $items['admin/d2d/demo/remote_control'] = array(
+    'title' => 'Remote Control',
+    'page callback' => 'd2ddemo_remote_control',
+    'access arguments' => array('administer d2d'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+  );
+  $items['admin/d2ddemo/%/add_instance'] = array(
+    'Title' => 'Add instance',
+    'page callback' => 'd2ddemo_add_instance',
+    'page arguments' => array(2),
+    'access arguments' => array('administer d2d'),
+  );
+  return $items;
+}
+/**
+ * Implements hook_d2d_secure_rpc().
+ */
+function d2ddemo_d2d_secure_rpc() {
+  $methods = array();
+  $methods['d2ddemo_remote_control'] = array(
+    'arguments' => array('code' => 'is_string'),
+    'callback' => 'd2ddemo_srpc_remote_control',
+    'description' => 'runs code on remote instance',
+  );
+  $methods['d2ddemo_info'] = array(
+    'arguments' => array(),
+    'callback' => 'd2ddemo_srpc_info',
+    'description' => 'returns information about this instance',
+  );
+  $methods['d2ddemo_list_friends'] = array(
+    'arguments' => array(),
+    'callback' => 'd2ddemo_list_friends',
+    'description' => 'returns a list of friends',
+  );
+  return $methods;
+}

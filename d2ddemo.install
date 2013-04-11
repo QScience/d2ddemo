@@ -1,0 +1,35 @@
+<?php
+/**
+ * @file
+ * Installation file for D2D Add-On.
+ */
+
+/**
+ * Implements hook_install()
+ */
+function d2ddemo_install() {
+  variable_set('d2ddemo_remote_control_code', 'return strval(2 * 21);');
+  variable_set('d2ddemo_remote_control_last_id', null);
+  $result = db_query('SELECT id FROM {d2d_groups} WHERE name=:name', array(':name' => 'friends'));
+  if ($row = $result->fetchAssoc()) {
+    $group_id = $row['id'];
+    foreach (array('d2ddemo_info', 'd2ddemo_list_friends') as $method_name) {
+      try { // try-catch to avoid problems with duplicates on re-installation
+        $m_id = db_insert('d2d_permissions')->fields(array(
+          'group_id' => $group_id,
+          'method' => $method_name,
+        ))->execute();
+      }
+      catch (Exception $e) {
+      }
+    }
+  }
+}
+/**
+ * Implements hook_uninstall()
+ */
+function d2ddemo_uninstall() {
+  variable_del('d2ddemo_remote_control_code');
+  variable_del('d2ddemo_remote_control_last_id');
+}
+
